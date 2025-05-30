@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Factorización de polinomios</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 15px 10px;
+      margin: 0;
+      background-color: #f9f9f9;
+      color: #222;
+    }
+    #app, #inicio {
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    #inicio {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+    }
+    #inicio h1 {
+      font-size: 2em;
+      margin-bottom: 30px;
+    }
+    #inicio input[type="text"] {
+      font-size: 1.2em;
+      padding: 8px 10px;
+      width: 80%;
+      max-width: 300px;
+      margin-bottom: 20px;
+      border-radius: 6px;
+      border: 1.5px solid #ccc;
+      box-sizing: border-box;
+      user-select: text;
+    }
+    #inicio button {
+      padding: 15px 30px;
+      font-size: 1.3em;
+      font-weight: bold;
+      background-color: #007bff;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.16);
+      transition: background-color 0.3s;
+      user-select: none;
+      width: 80%;
+      max-width: 300px;
+    }
+    #inicio button:hover {
+      background-color: #0056b3;
+    }
+    #app {
+      display: none;
+      padding-top: 20px;
+    }
+    h1 {
+      font-size: 1.8em;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    #saludoUsuario {
+      text-align: center;
+      font-size: 1.3em;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    #polinomio {
+      font-size: 1.4em;
+      font-weight: bold;
+      margin-bottom: 15px;
+      text-align: center;
+      word-wrap: break-word;
+    }
+    #opciones {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+      padding-left: 10px;
+    }
+    label {
+      background: #fff;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      padding: 10px 15px;
+      font-size: 1.1em;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.3s, border-color 0.3s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    label.correcto {
+      background-color: #d4edda;
+      border-color: #28a745;
+      color: #155724;
+    }
+    label.incorrecto {
+      background-color: #f8d7da;
+      border-color: #dc3545;
+      color: #721c24;
+    }
+    input[type="checkbox"] {
+      cursor: pointer;
+    }
+    button {
+      width: 100%;
+      max-width: 300px;
+      margin: 5px auto;
+      display: block;
+      padding: 14px 0;
+      font-size: 1.2em;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.16);
+      transition: background-color 0.3s;
+      user-select: none;
+    }
+    button:disabled {
+      background-color: #a0a0a0;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    button:hover:not(:disabled) {
+      background-color: #0056b3;
+    }
+    #estado {
+      margin-top: 15px;
+      font-weight: bold;
+      text-align: center;
+      font-size: 1.2em;
+      min-height: 28px;
+    }
+    #contador {
+      margin-top: 20px;
+      font-size: 1.2em;
+      text-align: center;
+      font-weight: 600;
+      color: #444;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="inicio">
+    <h1>Factorización de polinomios</h1>
+    <input type="text" id="nombreAlumno" placeholder="Ingrese su nombre" />
+    <button onclick="empezar()">Empezar</button>
+  </div>
+
+  <div id="app">
+    <h1>Factorización de polinomio</h1>
+    <div id="saludoUsuario"></div>
+
+    <div id="polinomio"></div>
+
+    <div id="opciones"></div>
+
+    <button id="verificarBtn" onclick="verificar()">Verificar</button>
+    <button id="siguienteBtn" onclick="siguiente()" style="display: none;">Siguiente</button>
+
+    <div id="estado"></div>
+    <div id="contador"></div>
+  </div>
+
+  <script>
+    const todosEjercicios = [
+      {
+        polinomio: "x³ - 6x² + 11x - 6",
+        factores: ["(x - 1)", "(x - 2)", "(x - 3)"],
+        opciones: ["(x + 1)", "(x - 4)", "(x - 3)", "(x - 2)", "(x + 3)", "(x - 1)"]
+      },
+      {
+        polinomio: "x³ + 6x² + 11x + 6",
+        factores: ["(x + 1)", "(x + 2)", "(x + 3)"],
+        opciones: ["(x - 1)", "(x + 2)", "(x + 3)", "(x + 1)", "(x - 2)", "(x + 4)"]
+      },
+      {
+        polinomio: "x³ - x² - 4x + 4",
+        factores: ["(x - 1)", "(x - 2)", "(x + 2)"],
+        opciones: ["(x + 1)", "(x - 2)", "(x + 2)", "(x - 3)", "(x - 1)", "(x - 4)"]
+      },
+      {
+        polinomio: "x³ - 7x² + 14x - 8",
+        factores: ["(x - 1)", "(x - 2)", "(x - 4)"],
+        opciones: ["(x - 1)", "(x + 1)", "(x - 2)", "(x + 4)", "(x - 4)", "(x - 3)"]
+      },
+      {
+        polinomio: "x³ - 3x² - 4x + 12",
+        factores: ["(x - 3)", "(x + 2)", "(x - 2)"],
+        opciones: ["(x + 3)", "(x - 3)", "(x + 2)", "(x - 2)", "(x + 1)", "(x - 1)"]
+      }
+    ];
+
+    let ejercicios = [];
+    let indice = 0;
+    let correctas = 0;
+    let nombreAlumno = "";
+
+    function elegirEjerciciosAleatorios(cantidad) {
+      let copia = [...todosEjercicios];
+      let seleccion = [];
+      while(seleccion.length < cantidad && copia.length > 0) {
+        let i = Math.floor(Math.random() * copia.length);
+        seleccion.push(copia.splice(i, 1)[0]);
+      }
+      return seleccion;
+    }
+
+    function mezclarArray(array) {
+      // Fisher-Yates shuffle
+      for (let i = array.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function cargarEjercicio() {
+      const e = ejercicios[indice];
+      document.getElementById("polinomio").textContent = e.polinomio;
+      const opcionesDiv = document.getElementById("opciones");
+      opcionesDiv.innerHTML = "";
+
+      // Mezclar opciones para que los correctos no estén siempre en las mismas posiciones
+      let opcionesMezcladas = mezclarArray([...e.opciones]);
+
+      opcionesMezcladas.forEach((opc, i) => {
+        let label = document.createElement("label");
+        label.htmlFor = `opc_${indice}_${i}`;
+
+        let input = document.createElement("input");
+        input.type = "checkbox";
+        input.id = `opc_${indice}_${i}`;
+        input.value = opc;
+
+        label.appendChild(input);
+        label.appendChild(document.createTextNode(opc));
+        opcionesDiv.appendChild(label);
+      });
+
+      document.getElementById("verificarBtn").disabled = false;
+      document.getElementById("siguienteBtn").style.display = "none";
+      document.getElementById("estado").textContent = "";
+      actualizarContador();
+    }
+
+    function verificar() {
+      const e = ejercicios[indice];
+      const checkboxes = document.querySelectorAll(`#opciones input[type="checkbox"]`);
+      let seleccionados = [];
+      checkboxes.forEach(cb => {
+        if(cb.checked) seleccionados.push(cb.value);
+      });
+
+      // Bloquear checkboxes y botón verificar para impedir reintentos
+      checkboxes.forEach(cb => cb.disabled = true);
+      document.getElementById("verificarBtn").disabled = true;
+
+      // Limpiar clases anteriores
+      [...document.querySelectorAll("#opciones label")].forEach(label => {
+        label.classList.remove("correcto", "incorrecto");
+      });
+
+      let correctoSet = new Set(e.factores);
+      let seleccionSet = new Set(seleccionados);
+
+      let acerto = true;
+
+      document.querySelectorAll("#opciones label").forEach(label => {
+        let texto = label.textContent.trim();
+
+        if(correctoSet.has(texto)) {
+          label.classList.add("correcto");
+          if(!seleccionSet.has(texto)) acerto = false;
+        } else {
+          if(seleccionSet.has(texto)) {
+            label.classList.add("incorrecto");
+            acerto = false;
+          }
+        }
+      });
+
+      const estado = document.getElementById("estado");
+      if(acerto) {
+        estado.textContent = "¡Correcto! Muy bien.";
+        estado.style.color = "#28a745";
+        correctas++;
+      } else {
+        estado.textContent = "Hay errores. Revisa las opciones marcadas.";
+        estado.style.color = "#dc3545";
+      }
+
+      document.getElementById("siguienteBtn").style.display = "block";
+      actualizarContador();
+    }
+
+    function siguiente() {
+      indice++;
+      if(indice >= ejercicios.length) {
+        mostrarResultadoFinal();
+      } else {
+        cargarEjercicio();
+      }
+    }
+
+    function mostrarResultadoFinal() {
+      document.getElementById("app").innerHTML = `
+        <h1>¡Ejercicios completados!</h1>
+        <p style="text-align:center; font-size:1.3em;">${nombreAlumno}, acertaste ${correctas} de ${ejercicios.length} ejercicios.</p>
+      `;
+    }
+
+    function empezar() {
+      nombreAlumno = document.getElementById("nombreAlumno").value.trim();
+      if(nombreAlumno === "") {
+        alert("Por favor, ingresa tu nombre para continuar.");
+        return;
+      }
+      document.getElementById("inicio").style.display = "none";
+      document.getElementById("app").style.display = "block";
+      document.getElementById("saludoUsuario").textContent = `Hola, ${nombreAlumno}!`;
+      ejercicios = elegirEjerciciosAleatorios(5);
+      cargarEjercicio();
+    }
+
+    function actualizarContador() {
+      document.getElementById("contador").textContent = `Ejercicio ${indice + 1} de ${ejercicios.length}`;
+    }
+  </script>
+</body>
+</html>
